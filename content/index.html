@@ -1,0 +1,211 @@
+[! extends "_templates/wrapper.html" !] 
+
+[! block main !]
+
+<style>
+#outputDiv {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr 1fr 1fr 1fr 1fr;
+}
+
+#outputDiv > div {
+  padding: 0.2rem;
+  font-size: 0.9rem;
+}
+
+</style>
+
+<hgroup>
+  <h1>[@ data.config.site_name @]</h1>
+</hgroup>
+
+<form>
+  <div>
+    <label for="persuasion_mod">Persuasion</label>
+    <input type="text" id="persuasion_mod" value="0" size="3">
+  </div>
+  <div>
+    <label for="character_level">Character Level</label>
+    <input type="text" id="character_level" value="1" size="3">
+  </div>
+  <div>
+    <label for="difficulty_mod">Difficulty</label>
+    <select id="difficulty_mod">
+      <option value="0">Normal</option>
+      <option value="-0.5" selected>Tactician</option>
+    </select>
+  </div>
+  <div>
+    <label for="attitude_mod">Current Vendor Attitude</label>
+    <input type="text" id="attitude_mod" value="0" size="3">
+  </div>
+  <div>
+    <label for="current_price">Current Vendor Price</label>
+    <input type="text" id="current_price" value="2000" size="5">
+  </div>
+
+  <div>
+    Base Price: <span id="base_price"></span>
+  </div>
+
+  <div id="outputDiv"></div>
+</form>
+
+
+<script type="module">
+
+function newDiv(value = "") {
+  const theDiv = document.createElement("div");
+  if (value !== "") {
+    theDiv.innerHTML = value
+  }
+  return theDiv
+}
+
+function handleChange() {
+  const values = {};
+  const rowDivs = [
+    newDiv("New Attitude"),
+    newDiv("Donation"),
+    newDiv("Multiplier"),
+    newDiv("New Price"),
+    newDiv("Total Gold"),
+    newDiv("Loss"),
+    newDiv("Savings"),
+  ];
+
+  const donationLevels = [
+    0, 4, 5, 6, 8, 10, 14, 18, 24, 30, 36, 45, 45
+  ]
+
+  const outputDiv = document.querySelector("#outputDiv");
+  outputDiv.innerHTML = "";
+
+  values.persuasion_mod = parseInt(document
+    .querySelector("#persuasion_mod").value, 10);
+
+  values.character_level = parseInt(document
+    .querySelector("#character_level").value, 10);
+
+  values.difficulty_mod = parseFloat(document
+    .querySelector("#difficulty_mod").value);
+
+  values.attitude_mod = parseInt(document
+    .querySelector("#attitude_mod").value, 10);
+
+  values.current_price = parseInt(document
+    .querySelector("#current_price").value, 10);
+
+  values.price_mod =
+    Math.max(
+      1.0, 
+      2.5 
+        - (values.persuasion_mod * 0.1) 
+        - values.difficulty_mod 
+        - (values.attitude_mod * 0.005)
+      );
+
+  values.base_price = values.current_price / values.price_mod;
+  base_price.innerHTML = Math.round(values.base_price);
+
+  for (let outputIndex = 0; outputIndex <= 100 - values.attitude_mod; outputIndex += 1) {
+
+    const newAttitude = values.attitude_mod + outputIndex;
+    rowDivs.push(newDiv(newAttitude));
+
+    const donation = donationLevels[values.character_level] * outputIndex
+    rowDivs.push(newDiv(donation));
+
+
+    const priceMultiplier = Math.max(
+      1.0, 
+      2.5
+        - (values.persuasion_mod * 0.1) 
+        - values.difficulty_mod 
+        - (newAttitude * 0.005)
+      )
+    rowDivs.push(newDiv(priceMultiplier.toFixed(3)));
+
+    const newPrice = Math.round(values.base_price * priceMultiplier);
+    rowDivs.push(newDiv(newPrice));
+
+    const totalAmount = donation + newPrice;
+    rowDivs.push(newDiv(totalAmount));
+
+    const diffAmount = Math.round(totalAmount - values.current_price)
+
+    if (diffAmount > 0) {
+      rowDivs.push(newDiv(diffAmount));
+      rowDivs.push(newDiv("-"));
+    } else if (diffAmount < 0) {
+      rowDivs.push(newDiv("-"));
+      rowDivs.push(newDiv(Math.abs(diffAmount)));
+    }
+    else {
+      rowDivs.push(newDiv("-"));
+      rowDivs.push(newDiv("-"));
+    }
+
+
+    //rowDivs.push(newDiv(diffAmount));
+    //rowDivs.push(newDiv("x"));
+
+/*
+    const attitudeDiv = newDiv(newAttitude);
+
+    const donation = donationLevels[values.character_level] * outputIndex
+    const donationDiv = newDiv(donation)
+
+    const priceMultiplier = Math.max(
+      1.0, 
+      2.5
+        - (values.persuasion_mod * 0.1) 
+        - values.difficulty_mod 
+        - (newAttitude * 0.005)
+      )
+    const priceMultiplierDiv = newDiv(priceMultiplier);
+
+    const newPrice = Math.round(values.base_price * priceMultiplier);
+    const newPriceDiv = newDiv(newPrice);
+
+    const totalAmount = donation + newPrice;
+    const totalAmountDiv = newDiv(totalAmount);
+
+    const diffAmount = Math.round(totalAmount - values.current_price)
+    const diffAmountDiv = newDiv(diffAmount);
+
+    outputDiv.appendChild(attitudeDiv);
+    outputDiv.appendChild(donationDiv);
+    outputDiv.appendChild(priceMultiplierDiv);
+    outputDiv.appendChild(newPriceDiv);
+    outputDiv.appendChild(totalAmountDiv);
+
+    if (diffAmount > 0) {
+      const lossDiv = newDiv("-");
+      const savingsDiv = newDiv(diffAmount);
+    outputDiv.appendChild(lossDiv);
+    outputDiv.appendChild(savingsDiv);
+    } else {
+      const savingsDiv = newDiv("-");
+      const lossDiv = newDiv(diffAmount);
+    outputDiv.appendChild(lossDiv);
+    outputDiv.appendChild(savingsDiv);
+    }
+    */
+
+    rowDivs.forEach((item) => {
+      outputDiv.appendChild(item);
+    })
+
+  }
+
+  console.log(values)
+}
+
+document.addEventListener("input", handleChange);
+handleChange();
+
+</script>
+
+[! endblock !]
+
