@@ -5,7 +5,7 @@
 <style>
 #outputDiv {
   display: grid;
-  grid-template-columns: 1fr 1fr 1fr 1fr 1fr 1fr 1fr;
+  grid-template-columns: 1fr 1fr 1fr 1fr 1fr 1fr;
 }
 
 #outputDiv > div {
@@ -65,9 +65,8 @@ function newDiv(value = "") {
 function handleChange() {
   const values = {};
   const rowDivs = [
-    newDiv("New Attitude"),
-    newDiv("Donation"),
-    newDiv("Multiplier"),
+    newDiv("For Attitude"),
+    newDiv("Donation Cost"),
     newDiv("New Price"),
     newDiv("Total Gold"),
     newDiv("Loss"),
@@ -124,7 +123,7 @@ function handleChange() {
         - values.difficulty_mod 
         - (newAttitude * 0.005)
       )
-    rowDivs.push(newDiv(priceMultiplier.toFixed(3)));
+    // rowDivs.push(newDiv(priceMultiplier.toFixed(3)));
 
     const newPrice = Math.round(values.base_price * priceMultiplier);
     rowDivs.push(newDiv(newPrice));
