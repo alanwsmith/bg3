@@ -1323,6 +1323,7 @@ video {
 #outputDiv {
   display: grid;
   grid-template-columns: 1fr 1fr 1fr 1fr 1fr 1fr;
+  padding-top: 1.4rem;
 }
 
 #outputDiv > div {
@@ -1361,9 +1362,11 @@ video {
     <input type="text" id="current_price" value="2000" size="5">
   </div>
 
+  <!--
   <div>
     Base Price: <span id="base_price"></span>
   </div>
+-->
 
   <div id="outputDiv"></div>
 </form>
@@ -1422,7 +1425,7 @@ function handleChange() {
       );
 
   values.base_price = values.current_price / values.price_mod;
-  base_price.innerHTML = Math.round(values.base_price);
+  //base_price.innerHTML = Math.round(values.base_price);
 
   for (let outputIndex = 0; outputIndex <= 100 - values.attitude_mod; outputIndex += 1) {
 
